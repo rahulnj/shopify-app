@@ -1,23 +1,29 @@
-import {
-  Card,
-  Page,
-  Layout,
-  TextContainer,
-  Image,
-  Stack,
-  Link,
-  Heading,
-  EmptyState,
-} from '@shopify/polaris'
 import { ResourcePicker } from '@shopify/app-bridge-react'
 import { useState } from 'react'
-import ProductList from '../components/ProductList'
 import { useEffect } from 'react'
-
+import ProductPage from '../components/ProductPage'
+import ProductEmptyState from '../components/ProductEmptyState'
+// import storeLegacy from 'store-js'
 export default function HomePage() {
   const [isOpen, setIsOpen] = useState(false)
   const [products, setProducts] = useState([])
   const [productsIds, setProductIds] = useState([])
+
+  const handleProductSelection = (payload) => {
+    setIsOpen(false)
+    setProducts(payload.selection)
+    localStorage.setItem(
+      'unbox-test-store-8888.myshopify.com-products',
+      JSON.stringify(payload.selection)
+    )
+  }
+  useEffect(() => {
+    const ProductList = JSON.parse(
+      localStorage.getItem('unbox-test-store-8888.myshopify.com-products')
+    )
+    setProducts(ProductList)
+  }, [])
+
   useEffect(() => {
     const ids = products.map((product) => {
       return {
@@ -33,34 +39,14 @@ export default function HomePage() {
         open={isOpen}
         onCancel={() => setIsOpen(false)}
         onSelection={(payload) => {
-          setIsOpen(false)
-          setProducts(payload.selection)
+          handleProductSelection(payload)
         }}
         initialSelectionIds={productsIds}
       />
       {products.length > 0 ? (
-        <Page
-          title='Product Selector'
-          primaryAction={{
-            content: 'Select Product',
-            onAction: () => {
-              setIsOpen(true)
-            },
-          }}
-        >
-          <ProductList products={products} />
-        </Page>
+        <ProductPage setIsOpen={setIsOpen} products={products} />
       ) : (
-        <EmptyState
-          heading='Manage the products you want to display'
-          action={{
-            content: 'Select Products',
-            onAction: () => setIsOpen(true),
-          }}
-          image='https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png'
-        >
-          <p>Select the products you want to use on your banner.</p>
-        </EmptyState>
+        <ProductEmptyState setIsOpen={setIsOpen} />
       )}
     </>
   )
