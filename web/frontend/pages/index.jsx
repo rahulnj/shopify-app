@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { useEffect } from 'react'
 import ProductPage from '../components/ProductPage'
 import ProductEmptyState from '../components/ProductEmptyState'
-// import storeLegacy from 'store-js'
 export default function HomePage() {
   const [isOpen, setIsOpen] = useState(false)
   const [products, setProducts] = useState([])
@@ -25,7 +24,7 @@ export default function HomePage() {
   }, [])
 
   useEffect(() => {
-    const ids = products.map((product) => {
+    const ids = products?.map((product) => {
       return {
         id: product.id,
       }
@@ -43,7 +42,7 @@ export default function HomePage() {
         }}
         initialSelectionIds={productsIds}
       />
-      {products.length > 0 ? (
+      {products?.length > 0 ? (
         <ProductPage setIsOpen={setIsOpen} products={products} />
       ) : (
         <ProductEmptyState setIsOpen={setIsOpen} />
